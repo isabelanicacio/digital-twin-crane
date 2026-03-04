@@ -14,7 +14,7 @@ function App() {
       loaderUrl: "unityBuild/Build/unityBuild.loader.js",
       dataUrl: "unityBuild/Build/unityBuild.data",
       frameworkUrl: "unityBuild/Build/unityBuild.framework.js",
-      codeUrl: "unityBuild/Build/unityBuild.wasm",
+      codeUrl: "unityBuild/Build/unityBuild.wasm",   
     });
 
   const [horizontalSensor, setHorizontalSensor] = useState(false);
@@ -134,7 +134,7 @@ function App() {
                     height="500vh"
                     src={`https://www.youtube.com/embed/${
                       import.meta.env.VITE_YOUTUBE_LIVE_ID
-                    }`}
+                    }?mute=1`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   ></iframe>
