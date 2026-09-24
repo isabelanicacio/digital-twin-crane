@@ -1,3 +1,19 @@
+/* Copyright (C) 2026 Eric Yugo Hioki, Alex Silveira de Campos, Eduardo de Senzi Zancul
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>. */
+
+import { logSensor, logSensorSnapshot, logVision, closeLogger } from "./logger.js";
 import opcua from "node-opcua";
 import express from "express";
 import http from "http";
@@ -32,6 +48,7 @@ const io = new socketIo(server, {
   },
 });
 app.use(cors());
+app.use(express.json());
 
 // === OPC UA Client Initialization ===
 const client = await connectToOPCUAServer(endpointUrl);
@@ -75,6 +92,11 @@ let session, subscription;
         console.log(`📥 Sensor ${sensor} updated:`, value);
 
         io.emit("sensorUpdate", { sensor, value });
+
+        logSensor(sensor, value, {
+  source_ts: dataValue.sourceTimestamp?.toISOString() ?? null,
+  server_ts: dataValue.serverTimestamp?.toISOString() ?? null,
+});
       });
     }
   } catch (err) {
@@ -90,6 +112,7 @@ io.on("connection", (socket) => {
     try {
       const sensorData = await readAllSensors(session);
       socket.emit("sensorData", sensorData);
+      logSensorSnapshot(sensorData);
     } catch (error) {
       console.error("Error reading sensors on connection:", error);
       socket.emit("sensorDataError", {
@@ -171,6 +194,9 @@ process.on("SIGINT", async () => {
     console.log("✅ OPC UA client disconnected");
   }
 
+  await closeLogger();
+console.log("✅ Data Logger fechado");
+  
   io.close(() => {
     console.log("✅ WebSocket server closed");
     process.exit(0);
@@ -180,6 +206,15 @@ process.on("SIGINT", async () => {
 // === Start Server ===
 server.listen(process.env.API_PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running at port: ${process.env.API_PORT}`);
+});
+
+// Placeholder da visão computacional — Semanas 3–4 passam a emitir visionUpdate aqui
+app.post("/api/vision", (req, res) => {
+  if (!req.body || typeof req.body !== "object") {
+    return res.status(400).json({ error: "JSON inválido" });
+  }
+  logVision(req.body);
+  return res.status(200).json({ ok: true });
 });
 
 app.get("/api/read/all", async (req, res) => {

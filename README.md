@@ -83,7 +83,18 @@ Both `client` and `server` use `.env` files for configuration. See the provided 
 
 ## License
 
-MIT
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+
+This project was developed by:
+* **Eric Yugo Hioki**
+* **Alex Silveira de Campos**
+* **Eduardo de Senzi Zancul**
+
+Under the supervision/cooperation of **Fábrica do Futuro da USP**.
+
+Copyright (C) 2026 Eric Yugo Hioki, Alex Silveira de Campos, Eduardo de Senzi Zancul
+
+This means you are free to use, study, modify, and redistribute this software, as long as any derivative works are also licensed under the GPLv3. For more details, please see the [LICENSE](LICENSE) file in this repository.
 
 ---
 
