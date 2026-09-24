@@ -13,7 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>. */
 
-import { logSensor, logSensorSnapshot, logVision, closeLogger } from "./logger.js";
+import { logSensor, logSensorSnapshot, logVision, auditSync, closeLogger } from "./logger.js";
 import opcua from "node-opcua";
 import express from "express";
 import http from "http";
