@@ -48,6 +48,7 @@ const io = new socketIo(server, {
   },
 });
 app.use(cors());
+app.use(express.json());
 
 // === OPC UA Client Initialization ===
 const client = await connectToOPCUAServer(endpointUrl);
@@ -91,6 +92,11 @@ let session, subscription;
         console.log(`📥 Sensor ${sensor} updated:`, value);
 
         io.emit("sensorUpdate", { sensor, value });
+
+        logSensor(sensor, value, {
+  source_ts: dataValue.sourceTimestamp?.toISOString() ?? null,
+  server_ts: dataValue.serverTimestamp?.toISOString() ?? null,
+});
       });
     }
   } catch (err) {
@@ -106,6 +112,7 @@ io.on("connection", (socket) => {
     try {
       const sensorData = await readAllSensors(session);
       socket.emit("sensorData", sensorData);
+      logSensorSnapshot(sensorData);
     } catch (error) {
       console.error("Error reading sensors on connection:", error);
       socket.emit("sensorDataError", {
@@ -187,6 +194,9 @@ process.on("SIGINT", async () => {
     console.log("✅ OPC UA client disconnected");
   }
 
+  await closeLogger();
+console.log("✅ Data Logger fechado");
+  
   io.close(() => {
     console.log("✅ WebSocket server closed");
     process.exit(0);
@@ -196,6 +206,15 @@ process.on("SIGINT", async () => {
 // === Start Server ===
 server.listen(process.env.API_PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running at port: ${process.env.API_PORT}`);
+});
+
+// Placeholder da visão computacional — Semanas 3–4 passam a emitir visionUpdate aqui
+app.post("/api/vision", (req, res) => {
+  if (!req.body || typeof req.body !== "object") {
+    return res.status(400).json({ error: "JSON inválido" });
+  }
+  logVision(req.body);
+  return res.status(200).json({ ok: true });
 });
 
 app.get("/api/read/all", async (req, res) => {
