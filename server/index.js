@@ -214,6 +214,13 @@ app.post("/api/vision", (req, res) => {
     return res.status(400).json({ error: "JSON inválido" });
   }
   logVision(req.body);
+
+  const status = auditSync(
+  { horizontal: lastValues.I2, vertical: lastValues.I4, garra: lastValues.I6 }, // ajuste ao mapeamento real
+  req.body // { horizontal, vertical, garra }
+);
+res.json({ ok: true, audit: status });
+
   return res.status(200).json({ ok: true });
 });
 
