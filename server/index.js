@@ -91,17 +91,17 @@ let session, subscription;
 
       monitoredItem.on("changed", (dataValue) => {
         const value = dataValue.value.value;
+        const sensor = nodeIdToSensor[node.nodeId] || node.nodeId;
         lastValues[sensor] = value;
 
-        const sensor = nodeIdToSensor[node.nodeId] || node.nodeId;
         console.log(`📥 Sensor ${sensor} updated:`, value);
 
         io.emit("sensorUpdate", { sensor, value });
 
         logSensor(sensor, value, {
-  source_ts: dataValue.sourceTimestamp?.toISOString() ?? null,
-  server_ts: dataValue.serverTimestamp?.toISOString() ?? null,
-});
+          source_ts: dataValue.sourceTimestamp?.toISOString() ?? null,
+          server_ts: dataValue.serverTimestamp?.toISOString() ?? null,
+        });
       });
     }
   } catch (err) {
