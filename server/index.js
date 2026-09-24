@@ -35,6 +35,9 @@ import {
 } from "./service.js";
 import cors from "cors";
 
+const lastValues = {};
+
+
 // === OPC UA Setup ===
 const endpointUrl = process.env.OPCUA_ENDPOINT;
 
@@ -88,6 +91,8 @@ let session, subscription;
 
       monitoredItem.on("changed", (dataValue) => {
         const value = dataValue.value.value;
+        lastValues[sensor] = value;
+
         const sensor = nodeIdToSensor[node.nodeId] || node.nodeId;
         console.log(`📥 Sensor ${sensor} updated:`, value);
 
@@ -221,7 +226,6 @@ app.post("/api/vision", (req, res) => {
 );
 res.json({ ok: true, audit: status });
 
-  return res.status(200).json({ ok: true });
 });
 
 app.get("/api/read/all", async (req, res) => {
